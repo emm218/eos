@@ -1,27 +1,27 @@
 ENTRY(_start)
+mmio				= 0xfffffffff8000000;
+fb					= 0xfffffffffc000000;
+bootboot		= 0xffffffffffe00000;
+enviornment	= 0xffffffffffe01000;
+
+PHDRS
+{
+	boot PT_LOAD;
+}
 SECTIONS
 {
-	. = 1M;
-	
-	.text : ALIGN(4K)
-	{
-		*(.multiboot)
-		*(.text)
-	}
+    . = 0xffffffffffe02000;
+    .text : {
+        KEEP(*(.text.boot)) *(.text .text.*)   /* code */
+        *(.rodata .rodata.*)                   /* data */
+        *(.data .data.*)
+    } :boot
+    .bss (NOLOAD) : {                          /* bss */
+        . = ALIGN(16);
+        *(.bss .bss.*)
+        *(COMMON)
+    } :boot
 
-	.rodata : ALIGN(4K)
-	{
-		*(.rodata)
-	}
-
-	.data : ALIGN(4K)
-	{
-		*(.data)
-	}
- 
-	.bss : ALIGN(4K)
-	{
-		*(COMMON)
-		*(.bss)
-	}
+    /DISCARD/ : { *(.eh_frame) *(.comment) }
 }
+

@@ -1,20 +1,20 @@
-CC=clang -target i686-none-elf
+CC=clang -target x86_64-none-elf
 LD=ld.lld
-AS=llvm-mc --arch=x86 --filetype=obj
+AS=llvm-mc --arch=x86_64 --filetype=obj
 
-CFLAGS+=-Wall -Wextra -Werror -ffreestanding 
-LDFLAGS+=-T link.ld -nostdlib
+CFLAGS+=-Wall -Wextra -Werror -ffreestanding -fpic 
+LDLIBS=-nostdlib
 
 debug: CFLAGS+=-g
-debug: eos.bin
+debug: eos.x86_64.elf
 
 release: CFLAGS+=-O2
-release: eos.bin
+release: eos.x86_64.elf
 
-eos.bin: kernel.o boot.o
-	$(LD) $(LDFLAGS) $^ -o $@
+eos.x86_64.elf: kernel.o
+	$(LD) $(LDFLAGS) -T link.ld $^ -o $@ $(LDLIBS)
 
 clean:
-	rm -f *.o *.iso *.bin
+	rm -rf *.o *.elf
 
 .PHONY: release clean
