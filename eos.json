@@ -1,5 +1,5 @@
 {
-	"config": "boot/cfg",
+	"config": "boot/sys/cfg",
 	"initrd": { "type": "tar", "directory": "boot" },
 	"partitions": [
 		{ "type": "boot", "size": 16 }

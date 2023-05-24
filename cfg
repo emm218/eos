@@ -1,1 +1,1 @@
-kernel=eos.x86_64.elf
+kernel=sys/eos.x86_64.elf
