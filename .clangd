@@ -1,0 +1,5 @@
+CompileFlags:
+	Add: [-Wall, -Werror, -Wextra, -ffreestanding, -fpic, -mno-red-zone]
+
+Index:
+	StandardLibrary: No

@@ -1,9 +1,9 @@
-CC=clang -target x86_64-none-elf
+CC=clang 
 LD=ld.lld
 AS=llvm-mc --arch=x86_64 --filetype=obj
 AR=ar
 
-CFLAGS+=-Wall -Wextra -Werror -ffreestanding -fpic 
+CFLAGS+=-target x86_64-none-elf -Wall -Wextra -Werror -ffreestanding -fpic -mno-red-zone
 LDFLAGS+=-L .
 LDLIBS=-nostdlib -lk
 
@@ -21,7 +21,8 @@ eos.img: eos.x86_64.elf eos.json cfg
 	cp cfg boot/sys/cfg
 	mkbootimg eos.json eos.img
 
-eos.x86_64.elf: kernel.o kprint.o console.o terminus.o libk.a
+eos.x86_64.elf: .EXTRA_PREREQS = libk.a
+eos.x86_64.elf: kernel.o kprint.o console.o terminus.o
 	$(LD) $(LDFLAGS) -T link.ld $^ -o $@ $(LDLIBS)
 
 libk.a: libk/string.o
@@ -32,6 +33,6 @@ libk.a: libk/string.o
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents $^ $@
 
 clean:
-	rm -rf *.o *.a *.elf *.img boot
+	rm -rf *.o libk/*.o *.a *.elf *.img boot
 
 .PHONY: release clean
