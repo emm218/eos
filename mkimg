@@ -1,0 +1,8 @@
+#!/usr/bin/sh
+
+set -e
+
+mkdir -p boot
+cp eos.x86_64.elf boot/eos.x86_64.elf
+cp cfg boot/cfg
+mkbootimg eos.json eos.img

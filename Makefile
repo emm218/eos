@@ -15,6 +15,6 @@ eos.x86_64.elf: kernel.o
 	$(LD) $(LDFLAGS) -T link.ld $^ -o $@ $(LDLIBS)
 
 clean:
-	rm -rf *.o *.elf
+	rm -rf *.o *.elf *.img boot
 
 .PHONY: release clean
