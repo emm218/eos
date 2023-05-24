@@ -25,6 +25,7 @@ above the script for creating bootable images relies on BOOTBOOT's tool.
 
 ## License
 
-All code is MIT licensed. The [Terminus](https://terminus-font.sourceforge.net/)
+Most of the codebase is MIT licensed. The implementation of `kprintf` was 
+adapted from OpenBSD's `kprintf` and so is licensed under the BSD 3 clause license. The [Terminus](https://terminus-font.sourceforge.net/)
 font used as a console font is licensed under the OFL, a copy of which is
 included with this repository.
