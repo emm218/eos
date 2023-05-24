@@ -17,6 +17,12 @@ mapping myself (maybe in the future I'll try to make it GRUB compatible again).
 Because of this, the `img` target in the makefile depends on BOOTBOOT's
 `mkbootimg` tool.
 
+## Dependencies
+
+Currently this project depends on several headers for the C standard library
+that aren't distributed with it. The testing script uses `qemu` and as explained
+above the script for creating bootable images relies on BOOTBOOT's tool.
+
 ## License
 
 All code is MIT licensed. The [Terminus](https://terminus-font.sourceforge.net/)
