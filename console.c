@@ -27,6 +27,9 @@ uint8_t *fb_ptr = &fb;
 
 static struct psf *font = (struct psf *)&_binary_terminus_psf_start;
 
+/*
+ * conputc -- prints a character ot the system console
+ */
 void
 conputc(int c)
 {
