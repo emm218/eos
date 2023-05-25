@@ -1,6 +1,6 @@
 CC=clang 
 LD=ld.lld
-AS=llvm-mc --arch=x86_64 --filetype=obj
+AS=llvm-mc --arch=x86-64 --filetype=obj
 AR=ar
 
 CFLAGS+=-target x86_64-none-elf -Wall -Wextra -Werror -ffreestanding -fpic -mno-red-zone
@@ -22,7 +22,7 @@ eos.img: eos.x86_64.elf eos.json cfg
 	mkbootimg eos.json eos.img
 
 eos.x86_64.elf: .EXTRA_PREREQS = libk.a
-eos.x86_64.elf: kernel.o kprint.o console.o terminus.o
+eos.x86_64.elf: kernel.o kprint.o console.o gdt.o terminus.o
 	$(LD) $(LDFLAGS) -T link.ld $^ -o $@ $(LDLIBS)
 
 libk.a: libk/string.o
