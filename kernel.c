@@ -4,6 +4,7 @@
 #include "kprint.h"
 
 void set_gdt(uint64_t addr, uint16_t size);
+void set_idt(uint64_t addr, uint16_t size);
 
 struct gdt_info {
 	uint16_t size;
@@ -35,7 +36,7 @@ struct idt_entry {
 
 /*
  * full of magic numbers but its okay because this doesnt matter for long mode
- * anyway
+ * anyway. empty 6th entry is for TSS
  */
 static struct gdt_entry gdt[6] = {
 	{ 0, 0, 0, 0, 0, 0 },		  // null descriptor

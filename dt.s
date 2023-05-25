@@ -1,3 +1,8 @@
+/*
+ * dt.s - 
+ * 		assembly routines for setting global descriptor table and interrupt
+ *		descriptor table
+ */
 .section .bss
 .global gdtr
 gdtr:

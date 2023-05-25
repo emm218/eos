@@ -1,13 +1,15 @@
 CC=clang 
 LD=ld.lld
-AS=llvm-mc --arch=x86-64 --filetype=obj
+AS=llvm-mc 
 AR=ar
 
 CFLAGS+=-target x86_64-none-elf -Wall -Wextra -Werror -ffreestanding -fpic -mno-red-zone
+ASFLAGS+=--arch=x86-64 --filetype=obj
 LDFLAGS+=-L .
 LDLIBS=-nostdlib -lk
 
 debug: CFLAGS+=-g
+debug: ASFLAGS+=-g
 debug: eos.x86_64.elf
 
 release: CFLAGS+=-O2
@@ -22,11 +24,11 @@ eos.img: eos.x86_64.elf eos.json cfg
 	mkbootimg eos.json eos.img
 
 eos.x86_64.elf: .EXTRA_PREREQS = libk.a
-eos.x86_64.elf: kernel.o kprint.o console.o gdt.o terminus.o
+eos.x86_64.elf: kernel.o paging.o interrupt.o dt.o kprint.o console.o terminus.o
 	$(LD) $(LDFLAGS) -T link.ld $^ -o $@ $(LDLIBS)
 
 libk.a: libk/string.o
-	ar rcs libk.a $^
+	ar rcs libk.a $?
 
 %.o: %.psf
 	objcopy -I binary -O elf64-x86-64 \
