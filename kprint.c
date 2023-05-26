@@ -107,6 +107,7 @@ loop:
 	sign = '\0';
 	prec = -1;
 	flags = 0;
+	width = 0;
 rflag:
 	c = *fmt++;
 reswitch:
@@ -230,7 +231,7 @@ reswitch:
 
 	if (!(flags & ZERO_PAD)) {
 		for (n = width - rlsz; n > 0; n--)
-			conputc(' ');
+			conputc('B');
 	}
 
 	if (sign)

@@ -44,7 +44,7 @@ conputc(int c)
 		return;
 	case '\t':
 		kx = (kx / TAB_STOP + 1) * TAB_STOP;
-		return;
+		goto wrap;
 	case ' ':
 		goto space;
 	}
@@ -64,6 +64,7 @@ conputc(int c)
 	}
 space:
 	kx++;
+wrap:
 	if (kx * WIDTH > bootboot.fb_width) {
 		kx = 0;
 		ky++;

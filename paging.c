@@ -4,7 +4,7 @@
 void
 print_pte(struct pte *p)
 {
-	kprintf("0x%02x\t0x%010lx%s\n", p->flags, p->address,
+	kprintf("%p: 0x%02x\t0x%010lx%s\n", p, p->flags, p->address,
 	    p->xd ? "\txd" : "");
 }
 
@@ -19,7 +19,7 @@ get_physical_addr(void *p)
 	    "movq %%rax, %0"
 	    : "=rm"(page_table));
 
-	a = ((uint64_t)p) >> PAGE_SHIFT;
+	a = ((uint64_t)p & (((long)1 << 48) - 1)) >> PAGE_SHIFT;
 	pml4 = a >> 27;
 	pdpt = a >> 18 & 0x01FF;
 	pd = a >> 9 & 0x01FF;

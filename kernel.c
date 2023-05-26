@@ -65,7 +65,7 @@ _start()
 
 	/* kprintf("%p\n", page_table); */
 
-	kprintf("%p 0x%016lx\n", page_table, get_physical_addr(page_table));
+	kprintf("%p 0x%016lx\n", _start, get_physical_addr(_start));
 
 	while (1)
 		;
