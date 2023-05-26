@@ -38,9 +38,6 @@ conputc(int c)
 	int x, y, offs, i;
 
 	switch (c) {
-	case '\0':
-		c = 'B';
-		break;
 	case '\n':
 		kx = 0;
 		ky++;

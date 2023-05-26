@@ -6,7 +6,7 @@ AR=ar
 CFLAGS+=-target x86_64-none-elf -Wall -Wextra -Werror -ffreestanding -fpic -mno-red-zone
 ASFLAGS+=--arch=x86-64 --filetype=obj
 LDFLAGS+=-L .
-LDLIBS=-nostdlib -lk 
+LDLIBS=-nostdlib -lk
 
 debug: CFLAGS+=-g
 debug: ASFLAGS+=-g
