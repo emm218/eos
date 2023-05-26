@@ -162,6 +162,7 @@ reswitch:
 		ulong = (uint64_t)va_arg(ap, void *);
 		base = HEX;
 		flags |= HEX_PREFIX;
+		prec = prec < 0 ? 16 : prec;
 		goto nosign;
 	case 'u':
 		ulong = UARG();

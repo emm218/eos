@@ -1,7 +1,9 @@
+#include <stddef.h>
 #include <stdint.h>
 
 #include "bootboot.h"
 #include "kprint.h"
+#include "paging.h"
 
 void set_gdt(uint64_t addr, uint16_t size);
 void set_idt(uint64_t addr, uint16_t size);
@@ -53,9 +55,22 @@ extern uint8_t fb;
 void
 _start()
 {
+	struct pte *page_table, *cur;
+
 	set_gdt((uint64_t)gdt, sizeof(gdt));
 
-	kprintf("%zu", sizeof(struct idt_entry));
+	asm("movq %%cr3, %%rax\n"
+	    "movq %%rax, %0"
+	    : "=rm"(page_table));
+
+	kprintf("%p\n", page_table);
+
+	cur = page_table;
+	print_pte(cur);
+	cur = (struct pte *)(cur->address * PAGE_SIZE);
+	print_pte(cur);
+	cur++;
+	print_pte(cur);
 
 	while (1)
 		;

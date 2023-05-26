@@ -1,13 +1,20 @@
 #include <stddef.h>
 
 const void *
-memchr(const void *ptr, int value, size_t num)
+memchr(const void *ptr, int c, size_t n)
 {
-	return __builtin_memchr(ptr, value, num);
+	const unsigned char *s = ptr;
+	c = (unsigned char)c;
+	for (; n && *s != c; s++, n--)
+		;
+	return n ? (void *)s : 0;
 }
 
 size_t
-strlen(const char *str)
+strlen(const char *s)
 {
-	return __builtin_strlen(str);
+	const char *a;
+	for (a = s; *s; s++)
+		;
+	return s - a;
 }
