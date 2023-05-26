@@ -16,4 +16,6 @@ struct pte {
 
 void print_pte(struct pte *);
 
+uint64_t get_physical_addr(void *);
+
 #endif

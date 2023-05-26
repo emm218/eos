@@ -55,7 +55,7 @@ extern uint8_t fb;
 void
 _start()
 {
-	struct pte *page_table, *cur;
+	struct pte *page_table;
 
 	set_gdt((uint64_t)gdt, sizeof(gdt));
 
@@ -63,14 +63,9 @@ _start()
 	    "movq %%rax, %0"
 	    : "=rm"(page_table));
 
-	kprintf("%p\n", page_table);
+	/* kprintf("%p\n", page_table); */
 
-	cur = page_table;
-	print_pte(cur);
-	cur = (struct pte *)(cur->address * PAGE_SIZE);
-	print_pte(cur);
-	cur++;
-	print_pte(cur);
+	kprintf("%p 0x%016lx\n", page_table, get_physical_addr(page_table));
 
 	while (1)
 		;
