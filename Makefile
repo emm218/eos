@@ -5,7 +5,7 @@ AR=ar
 
 CFLAGS+=-target x86_64-none-elf -Wall -Wextra -Werror -ffreestanding -fpic -mno-red-zone
 ASFLAGS+=--arch=x86-64 --filetype=obj
-LDFLAGS+=-L .
+LDFLAGS+=-L ./libs
 LDLIBS=-nostdlib -lk
 
 debug: CFLAGS+=-g
@@ -23,18 +23,18 @@ eos.img: eos.x86_64.elf eos.json cfg
 	cp cfg boot/sys/cfg
 	mkbootimg eos.json eos.img
 
-eos.x86_64.elf: .EXTRA_PREREQS = libk.a
+eos.x86_64.elf: .EXTRA_PREREQS = libs/libk.a
 eos.x86_64.elf: kernel.o paging.o interrupt.o dt.o kprint.o console.o terminus.o
 	$(LD) $(LDFLAGS) -T link.ld $^ -o $@ $(LDLIBS)
 
-libk.a: libk/string.o
-	ar rcs libk.a $?
+libs/libk.a: libk/string.o
+	ar rcs $@ $?
 
 %.o: %.psf
 	objcopy -I binary -O elf64-x86-64 \
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents $^ $@
 
 clean:
-	rm -rf *.o libk/*.o *.a *.elf *.img boot
+	rm -rf *.o */*.o libs/* *.elf *.img boot
 
 .PHONY: release clean

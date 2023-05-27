@@ -55,17 +55,23 @@ extern uint8_t fb;
 void
 _start()
 {
-	struct pte *page_table;
-
 	set_gdt((uint64_t)gdt, sizeof(gdt));
-
-	asm("movq %%cr3, %%rax\n"
-	    "movq %%rax, %0"
-	    : "=rm"(page_table));
 
 	/* kprintf("%p\n", page_table); */
 
-	kprintf("%p 0x%016lx\n", _start, get_physical_addr(_start));
+	/* kprintf("%p 0x%016lx\n", _start, get_physical_addr(_start)); */
+
+	unsigned int x, y;
+	uint8_t r, g;
+	uint32_t *cur = (uint32_t *)&fb;
+	for (y = 0; y < bootboot.fb_height; y++) {
+		r = y * 0xFF / (bootboot.fb_height - 1);
+		for (x = 0; x < bootboot.fb_width; x++) {
+			g = x * 0xFF / (bootboot.fb_width - 1);
+			*cur = r * 0x10000 + g * 0x100 + 0x7F;
+			cur++;
+		}
+	}
 
 	while (1)
 		;
