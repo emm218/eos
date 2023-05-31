@@ -105,6 +105,7 @@ kvprintf(const char *fmt0, va_list ap)
 loop:
 	while (*fmt != '%' && *fmt) {
 		conputc(*fmt++);
+		ret++;
 	}
 	if (*fmt == 0)
 		goto done;
@@ -265,4 +266,24 @@ reswitch:
 	goto loop;
 done:
 	return ret;
+}
+
+/*
+ * panic -- handle an unrecoverable error
+ */
+void
+panic(const char *fmt, ...)
+{
+	va_list ap;
+
+	va_start(ap, fmt);
+	kvprintf(fmt, ap);
+	va_end(ap);
+
+	/*
+	 * TODO once there's a file system and such, dump panic info and rebbot.
+	 * for now just spin.
+	 */
+	while (1)
+		;
 }

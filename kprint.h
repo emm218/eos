@@ -7,5 +7,6 @@
 
 int kprintf(const char *, ...) __attribute__((format(printf, 1, 2)));
 int kvprintf(const char *, va_list);
+void panic(const char *, ...) __attribute__((format(printf, 1, 2)));
 
 #endif
