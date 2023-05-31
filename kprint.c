@@ -61,6 +61,7 @@
 		flags & LONG_INT ? va_arg(ap, long) :      \
 		flags & SIZE_INT ? va_arg(ap, ssize_t) :   \
 				   va_arg(ap, int))
+
 int
 kprintf(const char *fmt, ...)
 {
@@ -74,7 +75,6 @@ kprintf(const char *fmt, ...)
 }
 
 // flags for kprintf
-
 #define HEX_PREFIX 0x01
 #define ZERO_PAD 0x02
 #define LONG_INT 0x04
@@ -83,17 +83,23 @@ kprintf(const char *fmt, ...)
 
 static const char *xdigs = "0123456789abcdef";
 
+/*
+ * kvprintf - prints a formatted message to system console and returns number of
+ * characters printed
+ */
 int
 kvprintf(const char *fmt0, va_list ap)
 {
 	char *fmt, *cp;
-	int c, n;
+	int c, n, ret;
 
 	uint64_t ulong;
 	enum { DEC, HEX } base;
 	int flags, prec, rlsz, size, width;
 	char sign;
 	char buf[KPRINTF_BUFSIZE];
+
+	ret = 0;
 
 	fmt = (char *)fmt0;
 loop:
@@ -230,29 +236,33 @@ reswitch:
 		rlsz += 2;
 
 	if (!(flags & ZERO_PAD)) {
-		for (n = width - rlsz; n > 0; n--)
+		for (n = width - rlsz; n > 0; n--, ret++)
 			conputc('B');
 	}
 
-	if (sign)
+	if (sign) {
 		conputc(sign);
-	else if (flags & HEX_PREFIX) {
+		ret++;
+	} else if (flags & HEX_PREFIX) {
 		conputc('0');
 		conputc('x');
+		ret += 2;
 	}
 
 	if (flags & ZERO_PAD) {
-		for (n = width - rlsz; n > 0; n--)
+		for (n = width - rlsz; n > 0; n--, ret++)
 			conputc('0');
 	}
 
-	for (n = prec - size; n > 0; n--)
+	for (n = prec - size; n > 0; n--, ret++)
 		conputc('0');
 
-	while (size--)
+	while (size--) {
 		conputc(*cp++);
+		ret++;
+	}
 
 	goto loop;
 done:
-	return 0;
+	return ret;
 }
