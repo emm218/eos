@@ -5,7 +5,7 @@ AR=ar
 
 CFLAGS+=-target x86_64-none-elf -Wall -Wextra -Werror -ffreestanding -fpic -mno-red-zone
 ASFLAGS+=--arch=x86-64 --filetype=obj
-LDFLAGS+=-L ./libs -g
+LDFLAGS+=-L ./libs
 LDLIBS=-nostdlib -lk
 
 OBJS+=console.o
@@ -19,6 +19,7 @@ OBJS+=tree.o
 
 debug: CFLAGS+=-g
 debug: ASFLAGS+=-g
+debug: LDFLAGS+=-g
 debug: eos.x86_64.elf
 
 release: CFLAGS+=-O2
