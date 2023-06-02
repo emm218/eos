@@ -11,17 +11,23 @@ PHDRS
 SECTIONS
 {
     . = 0xffffffffffe02000;
-    .text : {
-        KEEP(*(.text.boot)) *(.text .text.*)   /* code */
-        *(.rodata .rodata.*)                   /* data */
-        *(.data .data.*)
+    .text : ALIGN(4096) {                       /* code */
+        KEEP(*(.text.boot)) *(.text .text.*)    
     } :boot
-    .bss (NOLOAD) : {                          /* bss */
+    .data : ALIGN(4096) {                       /* data */
+        *(.data .data.*)
+    }
+    .ro_data : ALIGN(4096) {                    /* read-only data */
+        *(.rodata .rodata.*)
+    }
+    .bss (NOLOAD) : ALIGN(4096) {               /* bss */
         . = ALIGN(16);
         *(.bss .bss.*)
         *(COMMON)
     } :boot
-
+    
+    . = ALIGN(4096);
+    __kernel_brk = .;
     /DISCARD/ : { *(.eh_frame) *(.comment) }
 }
 
