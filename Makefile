@@ -8,14 +8,15 @@ ASFLAGS+=--arch=x86-64 --filetype=obj
 LDFLAGS+=-L ./libs
 LDLIBS=-nostdlib -lk
 
-OBJS+=console.o
-OBJS+=dt.o
-OBJS+=interrupt.o
-OBJS+=kernel.o
-OBJS+=kprint.o
-OBJS+=paging.o
-OBJS+=terminus.o
-OBJS+=tree.o
+OBJS= \
+console.o \
+dt.o \
+interrupt.o \
+kernel.o \
+kprint.o \
+paging.o \
+terminus.o \
+tree.o
 
 debug: CFLAGS+=-g
 debug: ASFLAGS+=-g
@@ -33,8 +34,7 @@ eos.img: eos.x86_64.elf eos.json cfg
 	cp cfg boot/sys/cfg
 	mkbootimg eos.json eos.img
 
-eos.x86_64.elf: .EXTRA_PREREQS += libs/libk.a
-eos.x86_64.elf: .EXTRA_PREREQS += link.ld
+eos.x86_64.elf: .EXTRA_PREREQS = libs/libk.a link.ld
 eos.x86_64.elf: $(OBJS)
 	$(LD) $(LDFLAGS) -T link.ld $^ -o $@ $(LDLIBS)
 
@@ -46,12 +46,12 @@ libs/libk.a: libk/string.o
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents $^ $@
 
 clean:
-	rm -rf *.o */*.o libs/* *.elf *.img boot
+	rm -rf *.o */*.o libs/* *.elf *.img boot .depend
 
 depend: .depend
 
 .depend: *.c
-	$(CC) $(CFLAGS) -MM $^ > $@
+	$(CC) -MM $^ > $@
 
 include .depend
 
