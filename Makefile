@@ -8,15 +8,11 @@ ASFLAGS+=--arch=x86-64 --filetype=obj
 LDFLAGS+=-L ./libs
 LDLIBS=-nostdlib -lk
 
-OBJS= \
-console.o \
+SRCS:=$(wildcard *.c)
+
+OBJS:=$(SRCS:.c=.o)\
 dt.o \
-interrupt.o \
-kernel.o \
-kprint.o \
-paging.o \
 terminus.o \
-tree.o
 
 debug: CFLAGS+=-g
 debug: ASFLAGS+=-g
@@ -29,7 +25,7 @@ release: eos.x86_64.elf
 img: eos.img
 
 eos.img: eos.x86_64.elf eos.json cfg
-	mkdir -p boot/sys
+	@mkdir -p boot/sys
 	cp eos.x86_64.elf boot/sys/eos.x86_64.elf
 	cp cfg boot/sys/cfg
 	mkbootimg eos.json eos.img
@@ -46,13 +42,12 @@ libs/libk.a: libk/string.o
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents $^ $@
 
 clean:
-	rm -rf *.o */*.o libs/* *.elf *.img boot .depend
+	rm -rf *.o */*.o .depend libs/* *.elf *.img boot
 
-depend: .depend
+.depend/%.d: %.c
+	@mkdir -p .depend 
+	@$(CC) $(CFLAGS) -MM $^ -MF $@
 
-.depend: *.c
-	$(CC) -MM $^ > $@
+include $(patsubst %.c, .depend/%.d, $(SRCS))
 
-include .depend
-
-.PHONY: release clean depend
+.PHONY: release clean
