@@ -24,7 +24,7 @@ eos.img: eos.x86_64.elf eos.json cfg
 	mkbootimg eos.json eos.img
 
 eos.x86_64.elf: .EXTRA_PREREQS = libs/libk.a
-eos.x86_64.elf: kernel.o paging.o interrupt.o dt.o kprint.o console.o terminus.o
+eos.x86_64.elf: kernel.o paging.o interrupt.o dt.o kprint.o console.o terminus.o tree.o
 	$(LD) $(LDFLAGS) -T link.ld $^ -o $@ $(LDLIBS)
 
 libs/libk.a: libk/string.o
@@ -36,5 +36,12 @@ libs/libk.a: libk/string.o
 
 clean:
 	rm -rf *.o */*.o libs/* *.elf *.img boot
+
+depend: .depend
+
+.depend: *.c
+	$(CC) $(CFLAGS) -MM $^ > $@
+
+include .depend
 
 .PHONY: release clean
