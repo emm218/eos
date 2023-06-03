@@ -9,6 +9,21 @@ cross compilation with than gcc. Compiling with GNU instead should be as simple
 as changing the CC, AS, and LD variables in the makefile to an appropriate
 cross-compilation toolchain.
 
+## Project Goals
+
+In kernel land:
+- loading and unloading of modules
+- use of multiple processors
+- ext4 filesystem support
+
+In user land:
+- networking
+- ability to port some existing software (shell, system utils, C compiler, etc.)
+- barebones graphical environment
+    - windowing
+    - scalable text rendering
+    - mouse and keyboard input
+
 ## Bootloader
 
 This project uses [BOOTBOOT](https://gitlab.com/bztsrc/bootboot/) since I didn't
