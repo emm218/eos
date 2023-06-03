@@ -13,6 +13,7 @@ cross-compilation toolchain.
 
 In kernel land:
 - loading and unloading of modules
+    - tooling to write modules in Rust
 - use of multiple processors
 - ext4 filesystem support
 
