@@ -41,15 +41,6 @@ void *_rb_parent(const struct rb_type *, const void *);
 
 /* clang-format off */
 /* clang-format can't make head or tails of this... */
-#define RBT_PROTOTYPE(name, type)						\
-extern const struct rb_type *const name##_RBT_TYPE;				\
-__attribute__((unused)) static inline type *name##_RBT_INSERT(name *, type *)	\
-__attribute__((unused)) static inline type *name##_RBT_REMOVE(name *, type *)	\
-__attribute__((unused)) static inline type *name##_RBT_LEFT(type *)		\
-__attribute__((unused)) static inline type *name##_RBT_RIGHT(type *)		\
-__attribute__((unused)) static inline type *name##_RBT_PARENT(type *)	
-
-
 #define RBT_GENERATE(name, type, field, cmp)			\
 typedef rb_tree name;						\
 								\
@@ -99,6 +90,5 @@ __attribute__((unused)) static inline type *			\
 name##_RBT_PARENT(type *elm)					\
 {								\
 	return _rb_parent(name##_RBT_TYPE, elm);		\
-} \
-                       \
+}
 /* clang-format on */
