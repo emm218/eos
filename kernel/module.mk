@@ -1,5 +1,5 @@
 M_SRC:=$(wildcard kernel/*.c) 
-SRC+=M_SRC
+SRC+=$(M_SRC)
 
 eos.x86_64.elf: .EXTRA_PREREQS = libs/libk.a kernel/link.ld
 eos.x86_64.elf: LDLIBS+=-lk
