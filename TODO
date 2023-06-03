@@ -23,3 +23,6 @@ Documentation
 
 I need to start annotating stuff with doxygen and potentially set up the docs to
 auto-deploy to github pages.
+
+update: I dislike doxygen and I can't find anything better so I'm going to write
+my own tool.
