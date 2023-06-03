@@ -1,0 +1,25 @@
+vim: textwidth=80 wrapmargin=0 formatoptions+=t linebreak
+
+--------------------------------------------------------------------------------
+Technical
+--------------------------------------------------------------------------------
+Page Frame Allocation
+
+current idea: maintain red-black tree of ranges of free page frames. I *think*
+this is what is used in openBSD and described in the presentation on pmemrange I
+found, but even if it isn't itll still hopefully work. This is ideal for cases
+where we need large blocks of contiguous page frames but for what I'm doing
+thats likely actually fairly rare. still, it will hopefully work well for the
+real common case of allocating 1 page at a time also.
+
+other ideas: I should read some more stuff to see how other kernels do it, maybe
+including some other hobby kernels since my use case isnt the same as linux or a
+BSD
+
+--------------------------------------------------------------------------------
+Project Meta
+--------------------------------------------------------------------------------
+Documentation
+
+I need to start annotating stuff with doxygen and potentially set up the docs to
+auto-deploy to github pages.
