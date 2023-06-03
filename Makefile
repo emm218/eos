@@ -7,22 +7,24 @@ CFLAGS+=-target x86_64-none-elf -Wall -Wextra -Werror -ffreestanding -fpic \
 				-mno-red-zone
 ASFLAGS+=--arch=x86-64 --filetype=obj
 LDFLAGS+=-L ./libs
-LDLIBS=-nostdlib -lk
+LDLIBS:=-nostdlib
 
-SRCS:=$(wildcard *.c)
+MODULES:=kernel libk
 
-OBJS:=$(SRCS:.c=.o)\
-dt.o \
-ter-b.o \
-ter-n.o \
+SRC:=
+
+include $(patsubst %, %/module.mk,$(MODULES))
+
+OBJ:=$(SRC .c=.o)
 
 debug: CFLAGS+=-g
 debug: ASFLAGS+=-g
 debug: LDFLAGS+=-g
-debug: eos.x86_64.elf
+debug: all
 
 release: CFLAGS+=-O2
-release: eos.x86_64.elf
+release: all
+
 
 img: eos.img
 
@@ -32,24 +34,18 @@ eos.img: eos.x86_64.elf eos.json cfg
 	cp cfg boot/sys/cfg
 	mkbootimg eos.json eos.img
 
-eos.x86_64.elf: .EXTRA_PREREQS = libs/libk.a link.ld
-eos.x86_64.elf: $(OBJS)
-	$(LD) $(LDFLAGS) -T link.ld $^ -o $@ $(LDLIBS)
-
-libs/libk.a: libk/string.o
-	ar rcs $@ $?
-
 %.o: %.psf
+	cd $(dir $^) && \
 	objcopy -I binary -O elf64-x86-64 \
-		--rename-section .data=.rodata,alloc,load,readonly,data,contents $^ $@
+		--rename-section .data=.rodata,alloc,load,readonly,data,contents $(notdir $^) $(notdir $@)
 
 clean:
-	rm -rf *.o */*.o libs/* *.elf *.img boot
+	rm -rf */*.o libs/* *.elf *.img boot
 
 .depend/%.d: %.c
-	@mkdir -p .depend 
+	@mkdir -p $(dir $@) 
 	$(CC) $(CFLAGS) -MM $^ -MF $@
 
-include $(patsubst %.c, .depend/%.d, $(SRCS))
+include $(patsubst %.c, .depend/%.d, $(filter %.c, $(SRC)))
 
 .PHONY: release clean

@@ -1,12 +1,11 @@
+/// @file kernel.c
 #include <stddef.h>
 #include <stdint.h>
 
 #include "bootboot.h"
+#include "dt.h"
 #include "kprint.h"
 #include "paging.h"
-
-void set_gdt(uint64_t addr, uint16_t size);
-void set_idt(uint64_t addr, uint16_t size);
 
 struct gdt_info {
 	uint16_t size;
@@ -14,12 +13,12 @@ struct gdt_info {
 } __attribute__((packed));
 
 struct gdt_entry {
-	uint16_t limit_low : 16;
+	uint16_t     limit_low : 16;
 	unsigned int base_low : 24;
-	uint8_t access : 8;
+	uint8_t	     access : 8;
 	unsigned int limit_high : 4;
 	unsigned int flags : 4;
-	uint8_t base_high : 8;
+	uint8_t	     base_high : 8;
 } __attribute__((packed));
 
 struct idt_entry {
@@ -33,7 +32,7 @@ struct idt_entry {
 			    // 2 bits - dpl
 			    // 1 bit  - present
 	unsigned long offset_high : 48;
-	uint32_t reserved; // always 0
+	uint32_t      reserved; // always 0
 } __attribute__((packed));
 
 /*
@@ -48,19 +47,20 @@ static struct gdt_entry gdt[6] = {
 	{ 0xFFFF, 0, 0xF2, 0xF, 0xC, 0 }, // user data
 };
 
-extern BOOTBOOT bootboot;
+extern BOOTBOOT	     bootboot;
 extern unsigned char environment[4096];
-extern uint8_t fb;
+extern uint8_t	     fb;
+extern uint8_t	     __kernel_brk;
 
+/**
+ * main entry point
+ */
 void
 _start()
 {
 	set_gdt((uint64_t)gdt, sizeof(gdt));
 
-	/* kprintf("%p\n", page_table); */
-
-	/* kprintf("%p 0x%016lx\n", _start, get_physical_addr(_start)); */
-
+	/*
 	unsigned int x, y;
 	uint8_t r, g;
 	uint32_t *cur = (uint32_t *)&fb;
@@ -72,7 +72,10 @@ _start()
 			cur++;
 		}
 	}
+	*/
 
-	while (1)
-		;
+	kprintf("\033[1;35m%p \033[0;32;44m%s\n", &__kernel_brk,
+	    "hiiiiiiiiiii");
+
+	while (1) { }
 }
