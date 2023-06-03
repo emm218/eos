@@ -21,7 +21,7 @@ debug: all
 release: CFLAGS+=-O2
 release: all
 
-include $(patsubst %, %/module.mk,$(MODULES))
+include $(patsubst %, %/.module.mk,$(MODULES))
 
 OBJ:=$(SRC .c=.o)
 
