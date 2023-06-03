@@ -16,9 +16,11 @@
 
 /* severely mutilated by emmy emmycelium 2023 */
 
+#include <stddef.h>
+
 struct rb_type {
-	int (*t_compare)(const void *, const void *);
-	unsigned int t_offset;
+	int (*compare)(const void *, const void *);
+	unsigned int offset;
 };
 
 struct rb_entry {
@@ -39,57 +41,64 @@ void *_rb_parent(const struct rb_type *, const void *);
 
 /* clang-format off */
 /* clang-format can't make head or tails of this... */
-#define RBT_PROTOTYPE(name, type)			\
-extern const struct rb_type *const name##_RBT_TYPE;	\
-							\
-typedef name rb_tree;					\
-							\
-__unused static inline type *				\
-name##_RBT_INSERT(name *head, type *elm)		\
-{							\
-	return _rb_insert(name##_RBT_TYPE, &head, elm);	\
-}							\
-							\
-__unused static inline type *				\
-name##_RBT_REMOVE(name *head, type *elm)		\
-{							\
-	return _rb_remove(name##_RBT_TYPE, &head, elm);	\
-}							\
-							\
-__unused static inline type *				\
-name##_RBT_FIND(name *head, type *elm)			\
-{							\
-	return _rb_find(name##_RBT_TYPE, &head, elm);	\
-}							\
-							\
-__unused static inline type *				\
-name##_RBT_LEFT(type *elm)				\
-{							\
-	return _rb_left(name##_RBT_TYPE, elm);		\
-}							\
-							\
-__unused static inline type *				\
-name##_RBT_RIGHT(type *elm)				\
-{							\
-	return _rb_right(name##_RBT_TYPE, elm);		\
-}							\
-							\
-__unused static inline type *				\
-name##_RBT_PARENT(type *elm)				\
-{							\
-	return _rb_parent(name##_RBT_TYPE, elm);	\
-}
+#define RBT_PROTOTYPE(name, type)						\
+extern const struct rb_type *const name##_RBT_TYPE;				\
+__attribute__((unused)) static inline type *name##_RBT_INSERT(name *, type *)	\
+__attribute__((unused)) static inline type *name##_RBT_REMOVE(name *, type *)	\
+__attribute__((unused)) static inline type *name##_RBT_LEFT(type *)		\
+__attribute__((unused)) static inline type *name##_RBT_RIGHT(type *)		\
+__attribute__((unused)) static inline type *name##_RBT_PARENT(type *)	
+
 
 #define RBT_GENERATE(name, type, field, cmp)			\
+typedef rb_tree name;						\
+								\
 static int							\
 name##_RBT_COMPARE(const void *lptr, const void *rptr)		\
 {								\
-	const type *l = lptr, *r = rptr				\
+	const type *l = lptr, *r = rptr;			\
 	return cmp(l, r);					\
 }								\
 static const struct rb_type name##_RBT_INFO = {			\
 	name##_RBT_COMPARE,					\
 	offsetof(type, field),					\
 }; 								\
-const struct rb_type *const name##_RBT_TYPE = &name##_RBT_INFO
+const struct rb_type *const name##_RBT_TYPE = &name##_RBT_INFO;	\
+								\
+__attribute__((unused)) static inline type *			\
+name##_RBT_INSERT(name *head, type *elm)			\
+{								\
+	return _rb_insert(name##_RBT_TYPE, head, elm);		\
+}								\
+								\
+__attribute__((unused)) static inline type *			\
+name##_RBT_REMOVE(name *head, type *elm)			\
+{								\
+	return _rb_remove(name##_RBT_TYPE, head, elm);		\
+}								\
+								\
+__attribute__((unused)) static inline type *			\
+name##_RBT_FIND(name *head, type *elm)				\
+{								\
+	return _rb_find(name##_RBT_TYPE, head, elm);		\
+}								\
+								\
+__attribute__((unused)) static inline type *			\
+name##_RBT_LEFT(type *elm)					\
+{								\
+	return _rb_left(name##_RBT_TYPE, elm);			\
+}								\
+								\
+__attribute__((unused)) static inline type *			\
+name##_RBT_RIGHT(type *elm)					\
+{								\
+	return _rb_right(name##_RBT_TYPE, elm);			\
+}								\
+								\
+__attribute__((unused)) static inline type *			\
+name##_RBT_PARENT(type *elm)					\
+{								\
+	return _rb_parent(name##_RBT_TYPE, elm);		\
+} \
+                       \
 /* clang-format on */
