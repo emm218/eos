@@ -3,7 +3,8 @@ LD=ld.lld
 AS=llvm-mc 
 AR=ar
 
-CFLAGS+=-target x86_64-none-elf -Wall -Wextra -Werror -ffreestanding -fpic -mno-red-zone
+CFLAGS+=-target x86_64-none-elf -Wall -Wextra -Werror -ffreestanding -fpic \
+				-mno-red-zone
 ASFLAGS+=--arch=x86-64 --filetype=obj
 LDFLAGS+=-L ./libs
 LDLIBS=-nostdlib -lk
@@ -42,11 +43,11 @@ libs/libk.a: libk/string.o
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents $^ $@
 
 clean:
-	rm -rf *.o */*.o .depend libs/* *.elf *.img boot
+	rm -rf *.o */*.o libs/* *.elf *.img boot
 
 .depend/%.d: %.c
 	@mkdir -p .depend 
-	@$(CC) $(CFLAGS) -MM $^ -MF $@
+	$(CC) $(CFLAGS) -MM $^ -MF $@
 
 include $(patsubst %.c, .depend/%.d, $(SRCS))
 
