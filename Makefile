@@ -13,7 +13,8 @@ SRCS:=$(wildcard *.c)
 
 OBJS:=$(SRCS:.c=.o)\
 dt.o \
-terminus.o \
+ter-b.o \
+ter-n.o \
 
 debug: CFLAGS+=-g
 debug: ASFLAGS+=-g
