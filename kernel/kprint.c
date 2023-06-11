@@ -48,7 +48,7 @@
  */
 #define to_digit(c) ((c) - '0')
 #define is_digit(c) ((unsigned)to_digit(c) <= 9)
-#define to_char(n) ((n) + '0')
+#define to_char(n)  ((n) + '0')
 
 #define UARG()                                                      \
 	(flags & LONG_LONG_INT	 ? va_arg(ap, unsigned long long) : \
@@ -75,11 +75,12 @@ kprintf(const char *fmt, ...)
 }
 
 // flags for kprintf
-#define HEX_PREFIX 0x01
-#define ZERO_PAD 0x02
-#define LONG_INT 0x04
-#define LONG_LONG_INT 0x08
-#define SIZE_INT 0x10
+#define HEX_PREFIX    0x01
+#define ZERO_PAD      0x02
+#define LEFT_JUST     0x04
+#define LONG_INT      0x08
+#define LONG_LONG_INT 0x10
+#define SIZE_INT      0x20
 
 static const char *xdigs = "0123456789abcdef";
 
@@ -145,6 +146,9 @@ reswitch:
 		}
 		prec = n < 0 ? -1 : n;
 		goto reswitch;
+	case '-':
+		flags |= LEFT_JUST;
+		goto rflag;
 	case '+':
 		sign = '+';
 		goto rflag;
@@ -158,6 +162,11 @@ reswitch:
 	case 'z':
 		flags |= SIZE_INT;
 		goto rflag;
+	case 'c':
+		*(cp = buf) = va_arg(ap, int);
+		size = 1;
+		sign = '\0';
+		break;
 	case 'd':
 		ulong = SARG();
 		if ((long long)ulong < 0) {
@@ -236,9 +245,9 @@ reswitch:
 	else if (flags & HEX_PREFIX)
 		rlsz += 2;
 
-	if (!(flags & ZERO_PAD)) {
+	if (!(flags & (ZERO_PAD | LEFT_JUST))) {
 		for (n = width - rlsz; n > 0; n--, ret++)
-			conputc('B');
+			conputc(' ');
 	}
 
 	if (sign) {
@@ -250,7 +259,7 @@ reswitch:
 		ret += 2;
 	}
 
-	if (flags & ZERO_PAD) {
+	if ((flags & (ZERO_PAD | LEFT_JUST)) == ZERO_PAD) {
 		for (n = width - rlsz; n > 0; n--, ret++)
 			conputc('0');
 	}
@@ -263,6 +272,10 @@ reswitch:
 		ret++;
 	}
 
+	if (flags & LEFT_JUST) {
+		for (n = width - rlsz; n > 0; n--, ret++)
+			conputc(' ');
+	}
 	goto loop;
 done:
 	return ret;
