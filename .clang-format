@@ -4,7 +4,7 @@
 BasedOnStyle: WebKit
 AlignAfterOpenBracket: DontAlign
 AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: true
+AlignConsecutiveDeclarations: false
 AlignConsecutiveMacros: AcrossComments
 AlignEscapedNewlines: Left
 AlignOperands: false
