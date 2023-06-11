@@ -13,7 +13,7 @@ MODULES:=kernel libk
 
 SRC:=
 
-debug: CFLAGS+=-g
+debug: CFLAGS+=-g -DDEBUG
 debug: ASFLAGS+=-g
 debug: LDFLAGS+=-g
 debug: all
@@ -39,7 +39,7 @@ eos.img: eos.x86_64.elf eos.json cfg
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents $(notdir $^) $(notdir $@)
 
 clean:
-	rm -rf */*.o libs/* *.elf *.img boot
+	rm -rf */*.o *.elf libs *.img boot
 
 .depend/%.d: %.c
 	@mkdir -p $(dir $@) 
