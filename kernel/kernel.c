@@ -1,4 +1,4 @@
-/// @file kernel.c
+/* @doc false */
 #include <stddef.h>
 #include <stdint.h>
 
@@ -7,33 +7,14 @@
 #include "kprint.h"
 #include "paging.h"
 
-struct gdt_info {
-	uint16_t size;
-	uint64_t addr;
-} __attribute__((packed));
+#define ARRAY_LEN(a) (sizeof(a) / sizeof(a[0]))
 
-struct gdt_entry {
-	uint16_t     limit_low : 16;
-	unsigned int base_low : 24;
-	uint8_t	     access : 8;
-	unsigned int limit_high : 4;
-	unsigned int flags : 4;
-	uint8_t	     base_high : 8;
-} __attribute__((packed));
+struct h_size {
+	size_t size;
+	char suffix;
+};
 
-struct idt_entry {
-	uint16_t offset_low;
-	uint16_t selector;  //  2 bits - rpl
-			    //  1 bit  - table
-			    // 13 bits - index
-	uint8_t ist;	    // always 0
-	uint8_t attributes; // 4 bits - type
-			    // 1 bit  - reserved
-			    // 2 bits - dpl
-			    // 1 bit  - present
-	unsigned long offset_high : 48;
-	uint32_t      reserved; // always 0
-} __attribute__((packed));
+struct h_size human_size(size_t);
 
 /*
  * full of magic numbers but its okay because this doesnt matter for long mode
@@ -47,17 +28,22 @@ static struct gdt_entry gdt[6] = {
 	{ 0xFFFF, 0, 0xF2, 0xF, 0xC, 0 }, // user data
 };
 
-extern BOOTBOOT	     bootboot;
+extern BOOTBOOT bootboot;
 extern unsigned char environment[4096];
-extern uint8_t	     fb;
-extern uint8_t	     __kernel_brk;
+extern uint8_t fb;
+extern uint8_t __kernel_brk;
 
-/**
+static const char *const MMAP_TYPES[] = { "USED", "FREE", "ACPI", "MMIO" };
+static const char SUFFIX[] = { ' ', 'K', 'M', 'G', 'T' };
+
+/*
  * main entry point
  */
 void
 _start()
 {
+	MMapEnt *cur;
+	struct h_size cur_size;
 	set_gdt((uint64_t)gdt, sizeof(gdt));
 
 	/*
@@ -73,9 +59,26 @@ _start()
 		}
 	}
 	*/
+	for (cur = &bootboot.mmap;
+	     (void *)cur < (void *)&bootboot + bootboot.size; cur++) {
 
-	kprintf("\033[1;35m%p \033[0;32;44m%s\n", &__kernel_brk,
-	    "hiiiiiiiiiii");
+		cur_size = human_size(MMapEnt_Size(cur));
+
+		kprintf("%p  %4zu%cB  %s\n", (void *)cur->ptr, cur_size.size,
+		    cur_size.suffix, MMAP_TYPES[MMapEnt_Type(cur)]);
+	}
+	kprintf("");
 
 	while (1) { }
+}
+
+struct h_size
+human_size(size_t bytes)
+{
+	size_t i;
+
+	for (i = 0; bytes >> 10 > 0 && i < ARRAY_LEN(SUFFIX); i++, bytes >>= 10)
+		;
+
+	return (struct h_size) { bytes, SUFFIX[i] };
 }
