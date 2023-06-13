@@ -64,6 +64,8 @@ struct pmem_range {
 	struct rb_entry pmr_tree; /* rb tree of pmrs sorted by addr */
 };
 
+static pte_t *kv_to_pte(void *);
+
 static int pmr_addr_cmp(const struct pmem_range *const,
     const struct pmem_range *const);
 
@@ -89,6 +91,13 @@ paging_init(MMapEnt *mmap, size_t n_mmap)
 
 	kprintf("%p\n", page_table);
 
-	page_table[PAGE_TABLE_ENTRIES - 1] = (pte_t)page_table | PRESENT |
-	    WRITABLE | XD;
+	page_table[255] = (pte_t)page_table | PRESENT | WRITABLE | XD;
+
+	kprintf("%lx\n", *kv_to_pte(PTE_BASE));
+}
+
+static pte_t *
+kv_to_pte(void *p)
+{
+	return PTE_BASE + pl1_i((vaddr_t)p);
 }
