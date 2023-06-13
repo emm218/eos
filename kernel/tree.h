@@ -16,6 +16,8 @@
 
 /* severely mutilated by emmy emmycelium 2023 */
 
+#ifndef _TREE_H
+#define _TREE_H
 #include <stddef.h>
 
 struct rb_type {
@@ -92,3 +94,4 @@ name##_RBT_PARENT(type *elm)					\
 	return _rb_parent(name##_RBT_TYPE, elm);		\
 }
 /* clang-format on */
+#endif /* _TREE_H */
