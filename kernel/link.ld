@@ -11,6 +11,7 @@ PHDRS
 SECTIONS
 {
     . = 0xffffffffffe02000;
+    __estart = .;
     .text : ALIGN(4096) {                       /* code */
         KEEP(*(.text.boot)) *(.text .text.*)    
     } :boot
