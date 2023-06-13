@@ -1,21 +1,18 @@
 #ifndef _PAGING_H
 #define _PAGING_H
 
+#include <stddef.h>
 #include <stdint.h>
 
-#define PAGE_SIZE 4096
-#define PAGE_SHIFT 12
+#include "bootboot.h"
 
-struct pte {
-	uint8_t flags;
-	unsigned int avl_1 : 4;
-	unsigned long address : 40;
-	unsigned int avl_2 : 11;
-	unsigned int xd : 1;
-} __attribute__((packed));
+typedef uintptr_t vaddr_t;
+typedef unsigned long paddr_t;
+
+struct pte *kv_to_pte(vaddr_t);
 
 void print_pte(struct pte *);
 
-uint64_t get_physical_addr(void *);
+void paging_init(MMapEnt *, size_t);
 
-#endif
+#endif /* _PAGING_H */

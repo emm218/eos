@@ -30,8 +30,9 @@ static struct gdt_entry gdt[6] = {
 
 extern BOOTBOOT bootboot;
 extern unsigned char environment[4096];
-extern uint8_t fb;
-extern uint8_t __kernel_brk;
+extern char fb;
+extern char __kernel_brk;
+extern char __estart;
 
 static const char *const MMAP_TYPES[] = { "USED", "FREE", "ACPI", "MMIO" };
 static const char SUFFIX[] = { ' ', 'K', 'M', 'G', 'T' };
@@ -44,6 +45,8 @@ _start()
 {
 	MMapEnt *cur;
 	struct h_size cur_size;
+	size_t n_mmap, i;
+
 	set_gdt((uint64_t)gdt, sizeof(gdt));
 
 	/*
@@ -59,15 +62,27 @@ _start()
 		}
 	}
 	*/
-	for (cur = &bootboot.mmap;
-	     (void *)cur < (void *)&bootboot + bootboot.size; cur++) {
 
+	cur_size = human_size(bootboot.initrd_size);
+
+	kprintf("%p %4zu%cB\n\n", (void *)bootboot.initrd_ptr, cur_size.size,
+	    cur_size.suffix);
+
+	kprintf("%p\n\n", &__estart);
+
+	n_mmap = (bootboot.size - sizeof(bootboot)) / sizeof(MMapEnt) + 1;
+
+	for (i = 0; i < n_mmap; i++) {
+		cur = &bootboot.mmap + i;
 		cur_size = human_size(MMapEnt_Size(cur));
 
 		kprintf("%p  %4zu%cB  %s\n", (void *)cur->ptr, cur_size.size,
 		    cur_size.suffix, MMAP_TYPES[MMapEnt_Type(cur)]);
 	}
-	kprintf("");
+
+	kprintf("\n");
+
+	paging_init(&bootboot.mmap, n_mmap);
 
 	while (1) { }
 }
