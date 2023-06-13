@@ -282,10 +282,10 @@ done:
 }
 
 /*
- * panic -- handle an unrecoverable error
+ * __panic -- handle an unrecoverable error
  */
 void
-panic(const char *fmt, ...)
+__panic(const char *fmt, ...)
 {
 	va_list ap;
 
