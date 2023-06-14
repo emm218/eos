@@ -4,6 +4,7 @@
 
 #include "bootboot.h"
 #include "dt.h"
+#include "interrupt.h"
 #include "kprint.h"
 #include "paging.h"
 
@@ -15,6 +16,12 @@ struct h_size {
 };
 
 struct h_size human_size(size_t);
+
+extern BOOTBOOT bootboot;
+extern unsigned char environment[4096];
+extern char fb;
+extern char __kernel_brk;
+extern char __estart;
 
 /*
  * full of magic numbers but its okay because this doesnt matter for long mode
@@ -28,11 +35,7 @@ static struct gdt_entry gdt[6] = {
 	{ 0xFFFF, 0, 0xF2, 0xF, 0xC, 0 }, // user data
 };
 
-extern BOOTBOOT bootboot;
-extern unsigned char environment[4096];
-extern char fb;
-extern char __kernel_brk;
-extern char __estart;
+extern idt_entry_t idt[256];
 
 static const char *const MMAP_TYPES[] = { "USED", "FREE", "ACPI", "MMIO" };
 static const char SUFFIX[] = { ' ', 'K', 'M', 'G', 'T' };
@@ -49,6 +52,9 @@ _start()
 
 	set_gdt((uint64_t)gdt, sizeof(gdt));
 
+	/* idt_init(); */
+
+	/* asm volatile("int $0"); */
 	/*
 	unsigned int x, y;
 	uint8_t r, g;
