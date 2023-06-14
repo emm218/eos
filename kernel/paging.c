@@ -63,7 +63,6 @@ struct pmem_range {
 };
 
 static pte_t *kv_to_pte(const void *);
-static uint64_t get_physical_addr(const void *);
 
 static int pmr_addr_cmp(const struct pmem_range *const,
     const struct pmem_range *const);
@@ -91,8 +90,6 @@ paging_init(MMapEnt *mmap, size_t n_mmap)
 
 	kprintf("%p\n", page_table);
 
-	kprintf("0x%016lx\n", get_physical_addr(pte_base));
-
 	page_table[255] = (pte_t)page_table | PRESENT | WRITABLE;
 
 	kprintf("0x%016lx\n", *kv_to_pte(pte_base));
@@ -100,51 +97,8 @@ paging_init(MMapEnt *mmap, size_t n_mmap)
 
 #define PTE_ADDRESS(p) (p & 0x000FFFFFFFFFF000)
 
-static void
-print_pte(pte_t *p)
-{
-	kprintf("%p: 0x%016lx\n", p, *p);
-}
-
 __attribute__((__unused__)) static pte_t *
 kv_to_pte(const void *p)
 {
 	return (pte_t *)(pte_base + ((vaddr_t)p >> 9));
-}
-
-static uint64_t
-get_physical_addr(const void *p)
-{
-	pte_t *page_table, *cur;
-	uint64_t a;
-	int pml4, pdpt, pd, pt;
-
-	asm("movq %%cr3, %0\n" : "=r"(page_table));
-
-	a = ((uint64_t)p & (((long)1 << 48) - 1)) >> PAGE_SHIFT;
-	pml4 = a >> 27;
-	pdpt = a >> 18 & 0x01FF;
-	pd = a >> 9 & 0x01FF;
-	pt = a & 0x01FF;
-
-	kprintf("%x %x %x %x\n", pml4, pdpt, pd, pt);
-
-	cur = page_table;
-	print_pte(cur + pml4);
-	if (!(cur[pml4] & PRESENT))
-		return 0;
-	cur = (pte_t *)(PTE_ADDRESS(cur[pml4]));
-	print_pte(cur + pdpt);
-	if (!(cur[pdpt] & PRESENT))
-		return 0;
-	cur = (pte_t *)(PTE_ADDRESS(cur[pdpt]));
-	print_pte(cur + pd);
-	if (!(cur[pd] & PRESENT))
-		return 0;
-	cur = (pte_t *)(PTE_ADDRESS(cur[pd]));
-	print_pte(cur + pt);
-	if (!(cur[pt] & PRESENT))
-		return 0;
-
-	return PTE_ADDRESS(cur[pt]) + ((uint64_t)p) % PAGE_SIZE;
 }
