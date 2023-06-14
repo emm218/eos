@@ -13,7 +13,7 @@ MODULES:=kernel libk
 
 SRC:=
 
-debug: CFLAGS+=-g -DDEBUG
+debug: CFLAGS+=-g
 debug: ASFLAGS+=-g
 debug: LDFLAGS+=-g
 debug: all
@@ -22,8 +22,6 @@ release: CFLAGS+=-O2
 release: all
 
 include $(patsubst %, %/.module.mk,$(MODULES))
-
-OBJ:=$(SRC .c=.o)
 
 img: eos.img
 
