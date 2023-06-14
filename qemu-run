@@ -1,4 +1,3 @@
 #!/usr/bin/sh
 
-make debug img
-qemu-system-x86_64 -drive format=raw,file=eos.img $@
+make -k debug img && qemu-system-x86_64 -drive format=raw,file=eos.img $@
