@@ -33,15 +33,7 @@
 #define L2_FRAME (L3_FRAME | L2_MASK)
 #define L1_FRAME (L2_FRAME | L1_MASK)
 
-#define pl1_i(VA) (((VA_SIGN_POS(VA)) & L1_FRAME) >> L1_SHIFT)
-#define pl2_i(VA) (((VA_SIGN_POS(VA)) & L2_FRAME) >> L2_SHIFT)
-#define pl3_i(VA) (((VA_SIGN_POS(VA)) & L3_FRAME) >> L3_SHIFT)
-#define pl4_i(VA) (((VA_SIGN_POS(VA)) & L4_FRAME) >> L4_SHIFT)
-
-#define pl1_pi(VA) (((VA_SIGN_POS(VA)) & L1_MASK) >> L1_SHIFT)
-#define pl2_pi(VA) (((VA_SIGN_POS(VA)) & L2_MASK) >> L2_SHIFT)
-#define pl3_pi(VA) (((VA_SIGN_POS(VA)) & L3_MASK) >> L3_SHIFT)
-#define pl4_pi(VA) (((VA_SIGN_POS(VA)) & L4_MASK) >> L4_SHIFT)
+#define PTE_ADDR(p) p & 0x0000FFFFFFFFF000
 
 // flags for PTEs
 #define PRESENT	      0x01
@@ -62,12 +54,16 @@ struct pmem_range {
 	struct rb_entry pmr_tree; /* rb tree of pmrs sorted by addr */
 };
 
-static pte_t *kv_to_pte(const void *);
-
 static int pmr_addr_cmp(const struct pmem_range *const,
     const struct pmem_range *const);
 
+static pte_t *kv_to_pte(const void *);
+
 RBT_GENERATE(pmr_tree_t, struct pmem_range, pmr_tree, pmr_addr_cmp);
+
+extern char xd_enable;
+
+extern uint8_t __estart;
 
 /* static pmr_tree_t free_tree = NULL; */
 static const void *pte_base = ((void *)(255 * NBPD_L4));
@@ -88,17 +84,18 @@ paging_init(MMapEnt *mmap, size_t n_mmap)
 
 	asm("movq %%cr3, %0" : "=r"(page_table));
 
-	kprintf("%p\n", page_table);
-
 	page_table[255] = (pte_t)page_table | PRESENT | WRITABLE;
-
-	kprintf("0x%016lx\n", *kv_to_pte(pte_base));
 }
 
-#define PTE_ADDRESS(p) (p & 0x000FFFFFFFFFF000)
-
-__attribute__((__unused__)) static pte_t *
+static pte_t *
 kv_to_pte(const void *p)
 {
-	return (pte_t *)(pte_base + ((vaddr_t)p >> 9));
+	return (
+	    pte_t *)(pte_base + ((VA_SIGN_POS((vaddr_t)p) & L1_FRAME) >> 9));
+}
+
+paddr_t
+va_to_pa(const void *p)
+{
+	return PTE_ADDR(*kv_to_pte(p)) + (paddr_t)p % PAGE_SIZE;
 }

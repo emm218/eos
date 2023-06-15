@@ -3,6 +3,7 @@
 #include "dt.h"
 #include "interrupt.h"
 #include "kprint.h"
+#include "paging.h"
 
 struct interrupt_frame {
 	uint64_t instruction_ptr;
@@ -12,7 +13,7 @@ struct interrupt_frame {
 	uint64_t stack_segment;
 };
 
-static void panic_todo(void);
+/* static void panic_todo(void); */
 
 __attribute__((aligned(0x10))) idt_entry_t idt[256];
 
@@ -20,15 +21,16 @@ __attribute__((interrupt)) void
 default_interrupt_handler(struct interrupt_frame *frame)
 {
 	(void)frame;
-
-	frame->rstack_ptr = (uint64_t)panic_todo;
+	asm volatile("cli\nhlt");
 }
 
+/*
 static void
 panic_todo(void)
 {
 	PANIC("todo!");
 }
+*/
 
 void
 set_isr(uint8_t vec, void *isr, uint8_t flags)
@@ -47,11 +49,13 @@ void
 idt_init()
 {
 	uint8_t i;
+	asm volatile("cli");
+
 	for (i = 0; i < 255; i++) {
 		set_isr(i, default_interrupt_handler, 0x8E);
 	}
 
-	set_idt((uint64_t)idt, sizeof(idt));
+	set_idt(va_to_pa(idt), sizeof(idt));
 
 	asm volatile("sti");
 }

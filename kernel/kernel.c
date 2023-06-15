@@ -40,6 +40,8 @@ extern idt_entry_t idt[256];
 static const char *const MMAP_TYPES[] = { "USED", "FREE", "ACPI", "MMIO" };
 static const char SUFFIX[] = { ' ', 'K', 'M', 'G', 'T' };
 
+char xd_enable;
+
 /*
  * main entry point
  */
@@ -50,11 +52,6 @@ _start()
 	struct h_size cur_size;
 	size_t n_mmap, i;
 
-	set_gdt((uint64_t)gdt, sizeof(gdt));
-
-	/* idt_init(); */
-
-	/* asm volatile("int $0"); */
 	/*
 	unsigned int x, y;
 	uint8_t r, g;
@@ -69,13 +66,6 @@ _start()
 	}
 	*/
 
-	cur_size = human_size(bootboot.initrd_size);
-
-	kprintf("%p %4zu%cB\n\n", (void *)bootboot.initrd_ptr, cur_size.size,
-	    cur_size.suffix);
-
-	kprintf("%p\n\n", &__estart);
-
 	n_mmap = (bootboot.size - sizeof(bootboot)) / sizeof(MMapEnt) + 1;
 
 	for (i = 0; i < n_mmap; i++) {
@@ -89,6 +79,12 @@ _start()
 	kprintf("\n");
 
 	paging_init(&bootboot.mmap, n_mmap);
+
+	set_gdt(va_to_pa(gdt), sizeof(gdt));
+
+	idt_init();
+
+	asm volatile("int $0");
 
 	while (1) { }
 }
