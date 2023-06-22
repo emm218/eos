@@ -3,7 +3,6 @@
 #include "dt.h"
 #include "interrupt.h"
 #include "kprint.h"
-#include "paging.h"
 
 struct interrupt_frame {
 	uint64_t instruction_ptr;
@@ -55,7 +54,7 @@ idt_init()
 		set_isr(i, default_interrupt_handler, 0x8E);
 	}
 
-	set_idt(va_to_pa(idt), sizeof(idt));
+	set_idt(idt, sizeof(idt));
 
 	asm volatile("sti");
 }
