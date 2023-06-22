@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 
-#define KERNEL_CS 1
-#define KERNEL_DS 2
-#define USER_CS	  3
-#define USER_DS	  4
-#define TSS	  5
+#define KERNEL_CS 1 * sizeof(struct gdt_entry)
+#define KERNEL_DS 2 * sizeof(struct gdt_entry)
+#define USER_CS	  3 * sizeof(struct gdt_entry)
+#define USER_DS	  4 * sizeof(struct gdt_entry)
+#define TSS	  5 * sizeof(struct gdt_entry)
 
 struct gdt_info {
 	uint16_t size;
@@ -23,7 +23,7 @@ struct gdt_entry {
 	uint8_t base_high : 8;
 } __attribute__((packed));
 
-void set_gdt(uint64_t addr, uint16_t size);
-void set_idt(uint64_t addr, uint16_t size);
+void set_gdt(void *addr, uint16_t size);
+void set_idt(void *addr, uint16_t size);
 
 #endif /* _DT_H */

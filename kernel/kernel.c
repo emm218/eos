@@ -1,4 +1,3 @@
-/* @doc false */
 #include <stddef.h>
 #include <stdint.h>
 
@@ -80,7 +79,7 @@ _start()
 
 	paging_init(&bootboot.mmap, n_mmap);
 
-	set_gdt(va_to_pa(gdt), sizeof(gdt));
+	set_gdt(gdt, sizeof(gdt));
 
 	idt_init();
 
