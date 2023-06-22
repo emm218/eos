@@ -41,7 +41,7 @@ clean:
 
 .depend/%.d: %.c
 	@mkdir -p $(dir $@) 
-	$(CC) $(CFLAGS) -MM $^ -MF $@
+	$(CC) $(CFLAGS) -MM $^ -MT $(^:.c=.o) -MF $@
 
 include $(patsubst %.c, .depend/%.d, $(filter %.c, $(SRC)))
 
