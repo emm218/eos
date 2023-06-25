@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdint.h>
 
 #include "bootboot.h"
@@ -9,20 +10,22 @@
 
 struct psf {
 	uint16_t magic;
-	uint8_t	 flags;
-	uint8_t	 char_size;
-	uint8_t	 glyphs[];
+	uint8_t flags;
+	uint8_t char_size;
+	uint8_t glyphs[];
 } __attribute__((packed));
 
 extern unsigned char _binary_ter_n_psf_start;
 extern unsigned char _binary_ter_b_psf_start;
-extern BOOTBOOT	     bootboot;
-extern uint8_t	     fb;
-uint8_t		    *fb_ptr = &fb;
+extern BOOTBOOT bootboot;
+extern uint8_t fb;
+uint8_t *fb_ptr = &fb;
 
 static struct psf *normal = (struct psf *)&_binary_ter_n_psf_start;
 static struct psf *bold = (struct psf *)&_binary_ter_b_psf_start;
 static struct psf *font = (struct psf *)&_binary_ter_n_psf_start;
+
+static void console_scroll();
 
 #define BLACK	0x000000
 #define RED	0xFF0000
@@ -36,24 +39,24 @@ static struct psf *font = (struct psf *)&_binary_ter_n_psf_start;
 static const uint32_t colors[8] = { BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA,
 	CYAN, WHITE };
 
+static uint32_t fg = WHITE, bg = BLACK;
+
 /*
  * conputc -- prints a character to the system console
  */
 void
 conputc(int c)
 {
-	static uint32_t kx, ky, ansi_esc, esc_code, fg = WHITE, bg = BLACK;
-	unsigned char  *glyph, mask;
-	int		x, y, offs, i;
+	static uint32_t kx, ky, ansi_esc, esc_code;
+	unsigned char *glyph, mask;
+	int x, y, offs, i;
 
 	if (ansi_esc)
 		goto ansi;
 
 	switch (c) {
 	case '\n':
-		kx = 0;
-		ky++;
-		return;
+		goto newline;
 	case '\t':
 		kx = (kx / TAB_STOP + 1) * TAB_STOP;
 		goto wrap;
@@ -85,8 +88,12 @@ space:
 	kx++;
 wrap:
 	if (kx * WIDTH > bootboot.fb_width) {
+	newline:
 		kx = 0;
-		ky++;
+		if (ky * font->char_size < bootboot.fb_height)
+			ky++;
+		else
+			console_scroll();
 	}
 	return;
 ansi:
@@ -134,4 +141,18 @@ ansi:
 		ansi_esc = 0;
 		break;
 	}
+}
+
+static void
+console_scroll()
+{
+	uint8_t *c, *fb_end;
+	size_t offset;
+
+	fb_end = fb_ptr + bootboot.fb_height * bootboot.fb_scanline;
+	offset = bootboot.fb_scanline * font->char_size;
+	for (c = fb_ptr; c + offset < fb_end; c++)
+		*c = *(c + offset);
+	for (; c < fb_end; c++)
+		*c = bg;
 }
