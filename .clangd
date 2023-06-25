@@ -1,5 +1,5 @@
 CompileFlags:
-	Add: [-Wall, -Werror, -Wextra, -ffreestanding, -fpic, -mno-red-zone]
+	Add: [-Wall, -Werror, -Wextra, -ffreestanding, -fpic, -mno-red-zone, -DDEBUG]
 
 Index:
 	StandardLibrary: No
