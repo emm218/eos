@@ -13,7 +13,7 @@ MODULES:=kernel libk
 
 SRC:=
 
-debug: CFLAGS+=-g
+debug: CFLAGS+=-g -DDEBUG
 debug: ASFLAGS+=-g
 debug: LDFLAGS+=-g
 debug: all
